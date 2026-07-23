@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Provincia {
+  id          String      @id @db.Char(2)
+  nombre      String      @db.VarChar(100)
+  localidades Localidad[]
+
+  @@map("provincia")
+}
+
+model Localidad {
+  id             String         @id @db.Char(11)
+  nombre         String         @db.VarChar(150)
+  provincia      Provincia      @relation(fields: [provinciaId], references: [id])
+  provinciaId    String         @db.Char(2)
+  codigosPostales CodigoPostal[]
+
+  @@map("localidad")
+}
+
+model CodigoPostal {
+  id          Int        @id @default(autoincrement())
+  codigo      String     @db.VarChar(4)
+  nombre      String?    @db.VarChar(200)
+  barrio      String?    @db.VarChar(150)
+  latitud     Decimal?   @db.Decimal(10, 7)
+  longitud    Decimal?   @db.Decimal(10, 7)
+
+  localidad   Localidad? @relation(fields: [localidadId], references: [id])
+  localidadId String?    @db.Char(11)
+
+  @@index([codigo])
+  @@map("codigo_postal")
+}
